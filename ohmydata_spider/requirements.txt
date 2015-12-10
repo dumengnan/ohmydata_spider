@@ -1,0 +1,8 @@
+#This is an implicit value, here for clarity
+--index https://pypi.python.org/simple/
+
+#scrapy==1.0.3
+#redis-server=2.8.4
+redis-py>=2.10.0
+scrapy-redis>=0.6.0
+pymongo>=3.1
