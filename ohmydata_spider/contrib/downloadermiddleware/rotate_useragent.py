@@ -4,6 +4,7 @@
 import random
 from scrapy.contrib.downloadermiddleware.useragent import UserAgentMiddleware
 
+
 class RotateUserAgentMiddleware(UserAgentMiddleware):
     """
         a useragent middleware which rotate the user agent when crawl websites
@@ -34,8 +35,7 @@ class RotateUserAgentMiddleware(UserAgentMiddleware):
         'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.12) Gecko/20080219 Firefox/2.0.0.12 Navigator/9.0.0.6', \
         ]
 
-
-    def __init__(self,user_agent=''):
+    def __init__(self, user_agent=''):
         self.user_agent = user_agent
 
     def _user_agent(self,spider):
@@ -44,7 +44,8 @@ class RotateUserAgentMiddleware(UserAgentMiddleware):
         elif self.user_agent:
             return self.user_agent
 
-        return random.choice(self.user_agent_list)#从列表中随机选取一个user_agent值返回
+        # 从列表中随机选取一个user_agent值返回
+        return random.choice(self.user_agent_list)
 
     # 当每个request通过下载中间件时，该方法被调用.spider参数代表spider对象,该request对应的spider
     def process_request(self, request, spider):

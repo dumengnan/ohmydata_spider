@@ -10,6 +10,26 @@ from scrapy.exceptions import DropItem
 from scrapy.conf import settings
 from scrapy import log
 import pymongo
+import functools
+
+
+def check_spider_pipeline(process_item_method):
+
+    @functools.wraps(process_item_method)
+    def wrapper(self, item, spider):
+
+        # message for debugging
+        msg = '%%s %s pipelien step'%(self.__class__.__name__,)
+
+        if self.__class__ in spider.pipeline:
+            spider.log(msg % 'executing', level=log.DEBUG)
+            return process_item_method(self, item, spider)
+        else:
+            spider.log(msg % 'skipping', level=log.DEBUG)
+            return item
+
+    return wrapper
+
 
 class MongoDBPipeline(object):
 
@@ -21,15 +41,8 @@ class MongoDBPipeline(object):
         db = connection[settings['MONGODB_DB']]
         self.collection = db[settings['MONGODB_COLLECTION']]
 
+    @check_spider_pipeline
     def process_item(self, item, spider):
-        if spider.name is not "myspider": #判断是否是对应的爬虫，如果不是返回item,保证只有相应的pipeline来处理对应的item
-            return item
-
-        print "proxy ip is :  " + str(item['proxy_ip'])
-        print 'proxy port is : ' + str(item['proxy_port'])
-        print 'proxy type is : ' + item['proxy_type']
-        print 'proxy locate is :' + item['proxy_locate']
-
         valid = True
         for data in item:
             if not data:
@@ -42,12 +55,11 @@ class MongoDBPipeline(object):
 
         return item
 
+
 class DataTreasurePipeline(object):
 
-    def process_item(self,item,spider):
-        if spider.name not in ['ohmygourd']:
-            return item
-
+    @check_spider_pipeline
+    def process_item(self, item, spider):
         print 'book name is :' + item['book_name']
         print 'book description is ' + item['book_description']
 

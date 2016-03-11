@@ -6,41 +6,38 @@ from scrapy.selector import Selector
 from ohmydata_spider.util.select_result import list_first_item,clean_url
 from scrapy.http import Request
 from ohmydata_spider.items import TutorialItem
+import ohmydata_spider.pipelines
+
 
 class MySpider(RedisSpider):
     name = 'myspider'
-    start_urls = (
-       'http://www.kjson.com/proxy/index/1',
-    )
+    start_urls = ('http://www.kjson.com/proxy/index/1',)
+
+    pipeline = set([
+        ohmydata_spider.pipelines.MongoDBPipeline,
+    ])
+
     proxy_porturl = {
-        "/welcome/port?p=0632efa6a661399532d58b3067c2fc58":80,
-        "/welcome/port?p=b276cf41e307d05f0ae916033d7fd2e3":1080,
-        "/welcome/port?p=924f319b7b5e8e6324dd8635a019b262":8080,
-        "/welcome/port?p=cea606afd9449152247d850abc1ec101":8088,
-        "/welcome/port?p=31c21daeb91cb8e885927c1f7e23a9ac":8888,
-        "/welcome/port?p=537ebe832aaaa219040f0719ebcc88c2":8118,
-        "/welcome/port?p=1f20fab73dffd2f111f54f6e4178b009":8008,
-        "/welcome/port?p=df05876b3d66ef4b4520cd3fd1281e04":3128,
-        "/welcome/port?p=06d8946406bf2bc2015454d257016c84":8123,
-        "/welcome/port?p=b8c44ce6567439c853b985e6ae720205":55336
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAB1UlEQVQ4jdWTzcspYRjGH9OxGdLIRhTNQhYWSKmxGxtJxrBQNvwDSlnxH8hCNkgWsrSwEU1Z2dhbKJqGRvlI81FY6NH0dBbzHm9HZ+Ws3mv13Pdz/+q+rroNEELwqbCPyZ8L/3q9eJ5vtVqr1Qoh5Pf7y+Wyy+UCACCE2u32ZDJBCDEMUywWv2kIIYRQVVWaphuNhqqql8ulWq2mUin9q9frsSy73+83m000Gh0Oh/CPvtY+Ho+32y2Xy5lMJoIg4vH4+XxGCAEARqNRPp+32+0kSTIMw3Hcu2eSJB0OR7fb1TTter0OBoNYLIZhmCRJkiT5fD59zOv1CoLwDhuNxk6nI4piKpViWdbj8VQqFQCALMsAAKvVqo8RBPF4PDRNe097sVhst9t0Oh2JRDiOWy6XeloAAAz7GjMYDH/FrVuXZZmiqOl0qpf1ej2ZTEIIBUEIhUK73U7vz2YzmqbfAzscDs/nMxgM6iVFUafTCSHkdDpxHF+v13p/s9m8/H+v7Xa7zWZzv9+/3++KogyHw0AggGEYhmGJRGIwGCiKIorieDzOZrMv2PC6qtVq1Ww2eZ7HcTwcDpdKJZvNpvuq1Wrz+dxisRQKhUwm8w/4A/3Qq/ov+Dc2O/z/LmddcAAAAABJRU5ErkJggg==":'80',
     }
 
     def parse(self, response):
         response_sel = Selector(response)
 
-        next_link =list_first_item(response_sel.xpath(u'//div[@class="page"]/a[text()="下一页"]/@href').extract())
+        next_link = list_first_item(response_sel.xpath(u'//div[@class="page"]/a[text()="下一页"]/@href').extract())
 
         if next_link:
             next_link = clean_url(response.url, next_link, response.encoding)
-            yield Request(url=next_link,callback=self.parse)
+            yield Request(url=next_link, callback=self.parse)
 
-        for item in self.parse_detail(response): # 必须使用for循环来调用parse_detail函数,否则只能解析第一个界面
+        print next_link
+        # 必须使用for循环来调用parse_detail函数,否则只能解析第一个界面
+        for item in self.parse_detail(response):
             yield item
 
-
-    def parse_detail(self,response):
-
+    def parse_detail(self, response):
         response_sel = Selector(response)
+
         table_bodys = response_sel.xpath('//*[@id="dataTables-example"]/tbody/tr')
 
         for table_body in table_bodys:
@@ -48,13 +45,11 @@ class MySpider(RedisSpider):
             port_url = str(list_first_item(table_body.xpath('./td[2]/img/@src').extract())).split('&')[0]
 
             if port_url in self.proxy_porturl:
-                proxy_item['proxy_port'] = self.proxy_porturl[port_url]
-                proxy_item['proxy_ip'] = list_first_item(table_body.xpath('./td[1]/text()').extract())
+                proxy_item['proxy_url'] = list_first_item(table_body.xpath('./td[1]/text()').extract()) + ':' + self.proxy_porturl[port_url]
                 proxy_item['proxy_type'] = list_first_item(table_body.xpath('./td[3]/text()').extract())
                 proxy_item['proxy_locate'] = list_first_item(table_body.xpath('./td[7]/text()').extract())
             else:
                 continue
-
             yield proxy_item
 
 

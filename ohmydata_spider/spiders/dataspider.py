@@ -7,12 +7,19 @@ from scrapy.selector import Selector
 from ohmydata_spider.util.select_result import list_first_item,clean_url
 from scrapy.http import Request
 from ohmydata_spider.items import DataTreasureItem
+import ohmydata_spider.pipelines
+
 
 class DataSpider(RedisSpider):
+
     name = "ohmygourd"
     start_urls = (
         'http://www.woaidu.org/sitemap_1.html',
     )
+
+    pipeline = set([
+        ohmydata_spider.pipelines.DataTreasurePipeline,
+    ])
 
     def parse(self, response):
         response_sel = Selector(response)
@@ -20,21 +27,23 @@ class DataSpider(RedisSpider):
         next_link = list_first_item(response_sel.xpath(u'//div[@class="k2"]/div/a[text()="下一页"]/@href').extract())
 
         if next_link:
-            next_link = clean_url(response.url,next_link, response.encoding)
-            yield Request(url=next_link,callback=self.parse)
+            next_link = clean_url(response.url, next_link, response.encoding)
+            yield Request(url=next_link, callback=self.parse)
 
         for detail_link in response_sel.xpath(u'//div[contains(@class,"sousuolist")]/a/@href').extract():
             if detail_link:
-                detail_link = clean_url(response.url,detail_link,response.encoding)
+                detail_link = clean_url(response.url, detail_link, response.encoding)
+                print detail_link
                 yield Request(url=detail_link, callback=self.parse_detail)
 
-
-    def parse_detail(self,response):
+    def parse_detail(self, response):
         data_item = DataTreasureItem()
 
         response_selector = Selector(response)
+
+        print '********************book name is ' + list_first_item(response_selector.xpath('//div[@class="zizida"][1]/text()').extract())
         data_item['book_name'] = list_first_item(response_selector.xpath('//div[@class="zizida"][1]/text()').extract())
-        data_item['book_description'] = list_first_item(response_selector.xpath('//div[@class="lili"][1]/text()').extract()).strip()
+        data_item['book_description'] = list_first_item(response_selector.xpath('//div[@class="lili"][1]/text()').extract())
 
         yield data_item
 

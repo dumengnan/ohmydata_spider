@@ -14,7 +14,7 @@ graphite
 
 TODO
 web界面展示部分(待做):
-django
+flask
 
 python库依赖问题
 解决思路

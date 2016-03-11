@@ -9,11 +9,11 @@
 
 from scrapy.item import Item, Field
 
+
 class TutorialItem(Item):
     # define the fields for your item here like:
     # name = Field()
-    proxy_ip = Field()
-    proxy_port = Field()
+    proxy_url = Field()
     proxy_type = Field()
     proxy_locate = Field()
 
