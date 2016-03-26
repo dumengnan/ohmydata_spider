@@ -5,36 +5,15 @@ __author__ = 'mee'
 
 import base64
 import random
-from scrapy.contrib.downloadermiddleware.httpproxy import HttpProxyMiddleware
+from scrapy.downloadermiddlewares.httpproxy import HttpProxyMiddleware
 import pymongo
+import logging
 
 
 class SelectorProxyMiddlerware(HttpProxyMiddleware):  # 中间件继承时一定要有__init__方法，否则不会被执行
 
+    # 实例化类时进行数据库连接
     def __init__(self):
-        pass
-
-    def process_request(self, request, spider):
-        print 'spider name is !!!!!!!!!' + spider.name
-        if spider.name is not 'ohmygourd':  # 不需要代理的爬虫直接不使用该组件
-            try:
-                return HttpProxyMiddleware.process_request(self,request,spider)
-            except AttributeError:
-                return super(SelectorProxyMiddlerware, self).process_request(request, spider)
-
-        proxy = self.getproxy_ip()
-
-        if proxy is not None:
-            if proxy['user_pass'] is not None:
-                request.meta['proxy'] = "http://%s" % (proxy['ip_port'])
-                encoded_user_pass = base64.encodestring(proxy['user_pass']).strip()
-                request.headers['Proxy-Authorization'] = 'Basic' + encoded_user_pass
-
-            else:
-                request.meta['proxy'] = "http://%s" % (proxy['ip_port'])
-
-    def getproxy_ip(self):
-        proxy_content = {}
         SingleMONGODB_SERVER = "localhost"
         SingleMONGODB_PORT = 27017
         MONGODB_DB = "proxyip_data"
@@ -47,21 +26,45 @@ class SelectorProxyMiddlerware(HttpProxyMiddleware):  # 中间件继承时一定
             )
 
             db = connection[MONGODB_DB]
-            collection = db[MONGODB_COLLECTION]
+            self.collection = db[MONGODB_COLLECTION]
+        except Exception, e:
+            logging.warning("connection mongodb error %s", e.message)
 
-            proj = collection.find({"proxy_type": "HTTP"}, {"proxy_ip": 1, "proxy_port": 1})
+    def process_request(self, request, spider):
 
-            proj.skip(random.randint(0, proj.count()))
+        proxy = self.getproxy_ip(spider.proxy)
 
-            proxy_info = proj.limit(-1).next()
+        if proxy is not None:
+            logger = logging.getLogger(spider.name)
+            logger.info("Select the proxy : %s" % (proxy['proxy_url']))
+            if proxy['user_pass'] is not None:
+                request.meta['proxy'] = proxy['proxy_url']
+                encoded_user_pass = base64.encodestring(proxy['user_pass']).strip()
+                request.headers['Proxy-Authorization'] = 'Basic' + encoded_user_pass
+            else:
+                request.meta['proxy'] = proxy['proxy_url']
 
-            print proxy_info
+    # 随机选取一个代理
+    def getproxy_ip(self, proxy_type):
+        try:
+            if proxy_type == 'http':
+                proj = self.collection.find({"proxy_type": "HTTP"}, {"proxy_url": 1})
+                proj.skip(random.randint(0, proj.count()))
+                proxy_info = proj.limit(-1).next()
+                proxy_dict = {'proxy_url': "http://%s"%(proxy_info['proxy_url']), "user_pass": None}
 
-            proxy_dict = {"ip_port": proxy_info['proxy_ip'] + ":" + str(proxy_info['proxy_port']), "user_pass": None}
+            elif proxy_type == 'https':
+                proj = self.collection.find({"proxy_type": "HTTPS"}, {"proxy_url": 1})
+                proj.skip(random.randint(0, proj.count()))
+                proxy_info = proj.limit(-1).next()
+                proxy_dict = {'proxy_url': "https://%s"%(proxy_info['proxy_url']), "user_pass": None}
+
+            elif proxy_type == 'GFW':
+                proxy_dict = {'proxy_url': "http://127.0.0.1:8118", "user_pass": None}
 
             return proxy_dict
         except Exception, e:
-            print 'get proxy find exception ' + e.message
+            self.logger.warning("Get proxy Exception from mongodb warn info: %s", e.message)
             return None
 
 

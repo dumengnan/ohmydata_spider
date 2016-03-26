@@ -8,7 +8,7 @@
 
 from scrapy.exceptions import DropItem
 from scrapy.conf import settings
-from scrapy import log
+import logging
 import pymongo
 import functools
 
@@ -20,12 +20,12 @@ def check_spider_pipeline(process_item_method):
 
         # message for debugging
         msg = '%%s %s pipelien step'%(self.__class__.__name__,)
-
+        logger = logging.getLogger(spider.name)
         if self.__class__ in spider.pipeline:
-            spider.log(msg % 'executing', level=log.DEBUG)
+            logger.info(msg % 'executing')
             return process_item_method(self, item, spider)
         else:
-            spider.log(msg % 'skipping', level=log.DEBUG)
+            logger.info(msg % 'skipping')
             return item
 
     return wrapper
@@ -50,8 +50,7 @@ class MongoDBPipeline(object):
                 raise DropItem("Missing {0}!".format(data))
         if valid:
             self.collection.insert(dict(item))
-            log.msg("proxy ip added to MonogoDB database",
-                    level=log.DEBUG,spider=spider)
+            self.logger.info("proxy ip added to MonogoDB database")
 
         return item
 
@@ -65,3 +64,16 @@ class DataTreasurePipeline(object):
 
         return item
 
+
+class JdBookPipeline(object):
+
+    @check_spider_pipeline
+    def process_item(self, item, spider):
+        return item
+
+
+class TmallCommentPipeline(object):
+
+    @check_spider_pipeline
+    def process_item(self, item, spider):
+        return item

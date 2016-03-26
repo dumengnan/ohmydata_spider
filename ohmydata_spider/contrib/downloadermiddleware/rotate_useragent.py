@@ -2,7 +2,8 @@
 # -*- coding:utf-8 -*-
 
 import random
-from scrapy.contrib.downloadermiddleware.useragent import UserAgentMiddleware
+from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+import logging
 
 
 class RotateUserAgentMiddleware(UserAgentMiddleware):
@@ -38,8 +39,8 @@ class RotateUserAgentMiddleware(UserAgentMiddleware):
     def __init__(self, user_agent=''):
         self.user_agent = user_agent
 
-    def _user_agent(self,spider):
-        if hasattr(spider,'user_agent'):
+    def _user_agent(self, spider):
+        if hasattr(spider, 'user_agent'):
             return spider.user_agent
         elif self.user_agent:
             return self.user_agent
@@ -50,6 +51,8 @@ class RotateUserAgentMiddleware(UserAgentMiddleware):
     # 当每个request通过下载中间件时，该方法被调用.spider参数代表spider对象,该request对应的spider
     def process_request(self, request, spider):
         uagent = self._user_agent(spider)
+        logger = logging.getLogger(spider.name)
+        logger.info("Select the user agent :%s", uagent)
         if uagent:
-            request.headers.setdefault('User-Agent',uagent)
+            request.headers.setdefault('User-Agent', uagent)
 

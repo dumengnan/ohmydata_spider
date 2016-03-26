@@ -23,3 +23,20 @@ class DataTreasureItem(Item):
     book_description = Field()
 
 
+class JdBookItem(Item):
+    number = Field()
+    bookName = Field()
+    author = Field()
+    press = Field()
+    bookId = Field()
+    price = Field()
+    preferentialPrice = Field()
+
+
+class TmallCommentItem(Item):
+    itemId = Field()
+    userNick = Field()
+    rateDate = Field()
+    rateContent = Field()
+
+

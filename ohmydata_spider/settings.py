@@ -9,15 +9,13 @@
 #     http://doc.scrapy.org/topics/settings.html
 #
 
-
-BOT_NAME = 'ohmydata_spider'
-BOT_VERSION = '0.1'
-
 SPIDER_MODULES = ['ohmydata_spider.spiders']
 NEWSPIDER_MODULE = 'ohmydata_spider.spiders'
 ITEM_PIPELINES = {
-    'ohmydata_spider.pipelines.DataTreasurePipeline',
-    'ohmydata_spider.pipelines.MongoDBPipeline',
+    'ohmydata_spider.pipelines.DataTreasurePipeline': 100,
+    'ohmydata_spider.pipelines.MongoDBPipeline': 200,
+    'ohmydata_spider.pipelines.JdBookPipeline': 300,
+    'ohmydata_spider.pipelines.TmallCommentPipeline': 400,
 }
 
 # 设置等待时间缓解服务器压力,并能够隐藏自己
@@ -29,17 +27,17 @@ RANDOMIZE_DOWNLOAD_DELAY = True
 DOWNLOAD_HANDLERS = {'s3':None,}
 # 下载中间件设置，下载中间件用于修改全局scrapy　request和response．
 DOWNLOADER_MIDDLEWARES = {
-    # 'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware':110,
+    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware':110,
     # 'ohmydata_spider.contrib.downloadermiddleware.selector_proxy.SelectorProxyMiddlerware':100,
-    'scrapy.contrib.downloadermiddlewares.useragent.UserAgentMiddleware':None,
+    'scrapy.extensions.downloadermiddlewares.useragent.UserAgentMiddleware':None,
     'ohmydata_spider.contrib.downloadermiddleware.rotate_useragent.RotateUserAgentMiddleware':400,#将中间件中的user_agent修改为自己实现的部分
 }
 USER_AGENT = ''
 
 # 爬虫状态信息
 # STATS_CLASS = 'ohmydata_spider.scrapy_graphite.graphite.RedisGraphiteStatsCollector'
-
-# graphite 设置
+#
+# # graphite 设置
 # GRAPHITE_HOST = 'localhost'
 # GRAPHITE_PORT = 2003
 # GRAPHITE_IGNOREKEYS = []
@@ -56,7 +54,6 @@ SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
 
 SCHEDULER_IDLE_BEFORE_CLOSE = 10
 
-
 # 数据存储部分设置
 SingleMONGODB_SERVER = "localhost"
 SingleMONGODB_PORT = 27017
@@ -68,3 +65,9 @@ ShardMONGODB_PORT = 27017
 ShardMONGODB_DB = "proxyip_mongo"
 GridFs_Collection = "proxyip_table"
 
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+
+# 数据序列化到文件
+FEED_URI=u'TmallComment.csv'
+FEED_FORMAT='CSV'

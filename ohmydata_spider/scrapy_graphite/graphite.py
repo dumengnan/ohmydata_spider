@@ -5,14 +5,15 @@ __author__ = 'mee'
 
 import redis
 import pprint
-from scrapy.statscol import StatsCollector
+from scrapy.statscollectors import StatsCollector
 from socket import socket
 from time import time
-from scrapy import log
+import logging
 
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 STATS_KEY = 'scrapy:stats'
+
 
 class GraPhiteClient(object):
     '''
@@ -20,9 +21,9 @@ class GraPhiteClient(object):
 
     according to /opt/graphite/examples/examples-client.py
     '''
-    def __init__(self,host="127.0.0.1",port=2003):
+    def __init__(self,host="127.0.0.1", port=2003):
         self._sock = socket()
-        self._sock.connect((host,port))
+        self._sock.connect((host, port))
 
     def send(self,metric, value, timestamp=None):
         try:
@@ -122,13 +123,14 @@ class RedisStatsCollector(object):
         pass
 
     def close_spider(self, spider, reason):
+        logger = logging.getLogger(spider.name)
         if self._dump:
-            log.msg("Dumping Scrapy stats:\n" + pprint.pformat(self.get_stats()), \
-                    spider=spider)
+            logger.info("Dumping Scrapy stats:\n" + pprint.pformat(self.get_stats()))
         self._persist_stats(self.get_stats(), spider)
 
     def _persist_stats(self, stats, spider):
         pass
+
 
 class RedisGraphiteStatsCollector(RedisStatsCollector):
     GRAPHITE_HOST = '127.0.0.1'
