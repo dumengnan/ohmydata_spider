@@ -19,13 +19,12 @@ def check_spider_pipeline(process_item_method):
     def wrapper(self, item, spider):
 
         # message for debugging
-        msg = '%%s %s pipelien step'%(self.__class__.__name__,)
+        msg = '%%s %s pipeline step'%(self.__class__.__name__,)
         logger = logging.getLogger(spider.name)
         if self.__class__ in spider.pipeline:
             logger.info(msg % 'executing')
             return process_item_method(self, item, spider)
         else:
-            logger.info(msg % 'skipping')
             return item
 
     return wrapper
@@ -73,6 +72,13 @@ class JdBookPipeline(object):
 
 
 class TmallCommentPipeline(object):
+
+    @check_spider_pipeline
+    def process_item(self, item, spider):
+        return item
+
+
+class WeiboPipeline(object):
 
     @check_spider_pipeline
     def process_item(self, item, spider):

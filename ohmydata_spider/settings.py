@@ -31,19 +31,21 @@ DOWNLOADER_MIDDLEWARES = {
     # 'ohmydata_spider.contrib.downloadermiddleware.selector_proxy.SelectorProxyMiddlerware':100,
     'scrapy.extensions.downloadermiddlewares.useragent.UserAgentMiddleware':None,
     'ohmydata_spider.contrib.downloadermiddleware.rotate_useragent.RotateUserAgentMiddleware':400,#将中间件中的user_agent修改为自己实现的部分
+    'ohmydata_spider.contrib.downloadermiddleware.Cookie.CookiesMiddleware':401,
 }
 USER_AGENT = ''
 
 # 爬虫状态信息
-# STATS_CLASS = 'ohmydata_spider.scrapy_graphite.graphite.RedisGraphiteStatsCollector'
-#
-# # graphite 设置
-# GRAPHITE_HOST = 'localhost'
-# GRAPHITE_PORT = 2003
-# GRAPHITE_IGNOREKEYS = []
+STATS_CLASS = 'ohmydata_spider.scrapy_graphite.graphite.RedisGraphiteStatsCollector'
+
+# graphite 设置
+GRAPHITE_HOST = 'localhost'
+GRAPHITE_PORT = 2003
+GRAPHITE_IGNOREKEYS = []
 
 # 禁用cookie
-COOKIES_ENABLED = False
+# COOKIES_ENABLED = False
+COOKIES_DEBUG=False
 
 # redis调度器相关设置部分
 SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
@@ -69,5 +71,5 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 
 # 数据序列化到文件
-FEED_URI=u'TmallComment.csv'
+FEED_URI=u'WeiboInfo.csv'
 FEED_FORMAT='CSV'

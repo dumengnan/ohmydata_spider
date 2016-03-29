@@ -40,3 +40,36 @@ class TmallCommentItem(Item):
     rateContent = Field()
 
 
+class WeiboInfoItem(Item):
+    """
+    weibo Account info
+    """
+    id = Field()
+    NickName = Field()
+    Gender = Field()
+    Province = Field()
+    City = Field()
+    Signature = Field()
+    Birthday = Field()
+    Num_Tweets = Field()
+    Num_Follows = Field()
+    Num_Fans = Field()
+    Sex_Orientation = Field()
+    Marriage = Field()
+    URL = Field()
+
+
+class WeiboContentItem(Item):
+    """
+    weibo content info
+    """
+    id = Field()
+    ID = Field()
+    Content = Field()
+    PubTime = Field()
+    Co_oridinates = Field()  # location
+    Tools = Field()  # publish tools eg.computer phone
+    Like = Field()  # count of the like
+    Comment = Field()  # count of the comment
+    Transfer = Field()
+

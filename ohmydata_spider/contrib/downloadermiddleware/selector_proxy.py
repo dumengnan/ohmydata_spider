@@ -64,7 +64,7 @@ class SelectorProxyMiddlerware(HttpProxyMiddleware):  # 中间件继承时一定
 
             return proxy_dict
         except Exception, e:
-            self.logger.warning("Get proxy Exception from mongodb warn info: %s", e.message)
+            logging.warning("Get proxy Exception from mongodb warn info: %s", e.message)
             return None
 
 
