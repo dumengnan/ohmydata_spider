@@ -96,9 +96,14 @@ class WeiboSpider(RedisSpider):
         urlFollows = "http://weibo.cn/%s/follow" % ID  # 爬第一页的关注，加入待爬队列
         idFollows = self.getNextID(urlFollows, response.request.cookies)
         for ID in idFollows:
-            url = "http://weibo.cn/%s/profile?filter=1&page=1" % ID
+            url = "http://weibo.cn/%s/info" % ID
             yield Request(url=url, callback=self.parse)
 
+        urlFans = "http://weibo.cn/%s/fans" % ID
+        idFans = self.getNextID(urlFans, response.request.cookies)
+        for ID in idFans:
+            url = "http://weibo.cn/%s/info" % ID
+            yield Request(url=url, callback=self.parse)
 
     def getNextID(self, url, cookies):
         """ 打开url爬取里面的个人ID """

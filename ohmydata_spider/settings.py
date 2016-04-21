@@ -25,13 +25,20 @@ RANDOMIZE_DOWNLOAD_DELAY = True
 
 # 关闭默认的s3下载处理器
 DOWNLOAD_HANDLERS = {'s3':None,}
+
+# 并发请求最大值
+CONCURRENT_REQUESTS = 64
+
+# 单个域名并发请求最大值
+CONCURRENT_REQUESTS_PER_DOMAIN = 32
+
 # 下载中间件设置，下载中间件用于修改全局scrapy　request和response．
 DOWNLOADER_MIDDLEWARES = {
-    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware':110,
-    # 'ohmydata_spider.contrib.downloadermiddleware.selector_proxy.SelectorProxyMiddlerware':100,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware':110,
+    'ohmydata_spider.contrib.downloadermiddleware.selector_proxy.SelectorProxyMiddlerware':100,
     'scrapy.extensions.downloadermiddlewares.useragent.UserAgentMiddleware':None,
     'ohmydata_spider.contrib.downloadermiddleware.rotate_useragent.RotateUserAgentMiddleware':400,#将中间件中的user_agent修改为自己实现的部分
-    'ohmydata_spider.contrib.downloadermiddleware.Cookie.CookiesMiddleware':401,
+    # 'ohmydata_spider.contrib.downloadermiddleware.Cookie.CookiesMiddleware':401,
 }
 USER_AGENT = ''
 
@@ -44,8 +51,8 @@ GRAPHITE_PORT = 2003
 GRAPHITE_IGNOREKEYS = []
 
 # 禁用cookie
-# COOKIES_ENABLED = False
-COOKIES_DEBUG=False
+COOKIES_ENABLED = True
+# COOKIES_DEBUG=False
 
 # redis调度器相关设置部分
 SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
@@ -70,6 +77,7 @@ GridFs_Collection = "proxyip_table"
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 
+
 # 数据序列化到文件
-FEED_URI=u'WeiboInfo.csv'
+FEED_URI = u'ProductInfo.csv'
 FEED_FORMAT='CSV'

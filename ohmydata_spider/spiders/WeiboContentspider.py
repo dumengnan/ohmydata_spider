@@ -18,7 +18,7 @@ class Spider(RedisSpider):
     host = "http://weibo.cn"
 
     start_urls = []
-    proxy = 'http'
+    proxy = 'GFW'
 
     pipeline = set([
         ohmydata_spider.pipelines.WeiboPipeline,

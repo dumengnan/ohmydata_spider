@@ -34,6 +34,10 @@ class JdBookItem(Item):
 
 
 class TmallCommentItem(Item):
+    ItemName = Field()
+    ItemType = Field()
+    ItemSales = Field()
+    ItemPrice = Field()
     itemId = Field()
     userNick = Field()
     rateDate = Field()

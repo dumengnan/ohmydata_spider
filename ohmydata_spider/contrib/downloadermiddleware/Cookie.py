@@ -13,6 +13,6 @@ class CookiesMiddleware(object):
 
     def process_request(self, request, spider):
         cookie = random.choice(cookies)
-        #logger = logging.getLogger(spider.name)
-        #logger.info("Get the cookie: %s" % (cookie))
+        # logger = logging.getLogger(spider.name)
+        # logger.info("Get the cookie: %s" % (cookie))
         request.cookies = cookie

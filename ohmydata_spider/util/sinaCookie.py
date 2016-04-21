@@ -12,8 +12,7 @@ __author__ = 'mee'
     Crawl Weibo Account
 '''
 WeiBoAccount = [
-    {'user': 'ddcn00@mailnesia.com', 'psw': 'pp9999'},
-    {'user': 'vhq30g@mailnesia.com', 'psw': 'pp9999'},
+    {'user': 'luzuidv13893@163.com', 'psw': 'a123456'},
 ]
 
 
@@ -52,8 +51,10 @@ def getCookies(weibo):
         r = session.post(loginURL, data=postData)
         jsonStr = r.content.decode('gbk')
         info = json.loads(jsonStr)
+
         if info["retcode"] == "0":
-            #logging.info("Cookie Account: %s"%(account))
+            print "Cookie Account: %s"%(account)
+            logging.info("Cookie Account: %s"%(account))
             cookie = session.cookies.get_dict()
             cookies.append(cookie)
         else:
