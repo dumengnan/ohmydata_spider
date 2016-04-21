@@ -32,7 +32,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/mee/cpython/tutorial/tutorial_ENV"
+set -gx VIRTUAL_ENV "/home/mee/cpython/ohmydata_spider/ohmydata_spider_ENV"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

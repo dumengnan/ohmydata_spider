@@ -39,7 +39,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/mee/cpython/tutorial/tutorial_ENV"
+VIRTUAL_ENV="/home/mee/cpython/ohmydata_spider/ohmydata_spider_ENV"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
